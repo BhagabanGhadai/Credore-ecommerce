@@ -5,11 +5,66 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @unique @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  orders     Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id            String      @id @unique @default(cuid())
+  name          String
+  description   String?
+  price         Float
+  stockQuantity Int
+  orderItems    OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id         String      @id @unique @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade )
+  status     Status      @default(pending)
+  totalPrice Float
+  items      OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @unique @default(cuid())
+  orderId    String
+  productId  String
+  quantity   Int
+  price      Float
+  totalPrice Float
+  order      Order   @relation(fields: [orderId], references: [id])
+  product    Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+
+enum Status {
+  pending
+  cancelled 
+  delivered
 }
