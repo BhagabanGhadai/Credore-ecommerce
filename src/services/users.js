@@ -2,6 +2,7 @@ const UserRepository = require('../repositories/users.js');
 const AppError = require('../utils/appError.js');
 const StatusCodes = require('http-status-codes');
 const helpers = require('../utils/helpers.js');
+const logger = require('../utils/logger.js')
 
 class UserService {
     constructor() {

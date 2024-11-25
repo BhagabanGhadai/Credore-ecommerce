@@ -41,19 +41,20 @@ class Helper {
         return jwt.verify(accessToken, configs.JWT_ACCESS_SECRET)
     }
     static async decodeRefreshToken(refreshToken) {
-        return jwt.verify(refreshToken, configs.REFRESH_TOKEN_SECRET)
+        return jwt.verify(refreshToken, configs.JWT_REFRESH_SECRET)
     }
-    static async blacklistToken(refreshToken,accessToken) { 
-        const decodedRefreshToken = this.decodeRefreshToken(refreshToken);
-        const decodeAccessToken = this.decodeAccessToken(accessToken);
-        const refreshTokenExpiresIn = decodedRefreshToken.exp * 1000 - Date.now(); 
-        const accessTokenExpiresIn = decodeAccessToken.exp * 1000 - Date.now(); 
-        if (accessTokenExpiresIn > 0) { 
-            await redis.set(`access:blacklist:${accessToken}`, accessToken, 'PX', accessTokenExpiresIn); 
+    static async blacklistToken(refreshToken, accessToken) {
+        const decodedRefreshToken = await this.decodeRefreshToken(refreshToken);
+        const decodedAccessToken = await this.decodeAccessToken(accessToken);
+        const refreshTokenExpiresIn = decodedRefreshToken.exp * 1000 - Date.now();
+        const accessTokenExpiresIn = decodedAccessToken.exp * 1000 - Date.now();
+
+        if (accessTokenExpiresIn > 0) {
+            await redis.set(`access:blacklist:${accessToken}`, accessToken, 'PX', accessTokenExpiresIn);
         }
-        if (refreshTokenExpiresIn > 0) { 
-            await redis.set(`refresh:blacklist:${refreshToken}`, refreshToken, 'PX', refreshTokenExpiresIn); 
-        } 
+        if (refreshTokenExpiresIn > 0) {
+            await redis.set(`refresh:blacklist:${refreshToken}`, refreshToken, 'PX', refreshTokenExpiresIn);
+        }
     }
     static async isAccessTokenBlacklisted(accessToken) { 
         const blacklistedAccessToken = await redis.get(`access:blacklist:${accessToken}`);
