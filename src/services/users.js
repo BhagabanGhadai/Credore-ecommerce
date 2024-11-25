@@ -40,6 +40,10 @@ class UserService {
     }
     async refreshAccessToken(refreshToken) {
         try {
+            const verifyRefreshToken = await helpers.isRefreshTokenBlacklisted(refreshToken);
+            if (verifyRefreshToken) {
+                throw new AppError(StatusCodes.FORBIDDEN, 'Token Is Revoked')
+            }
             const decodeAccessToken = await helpers.decodeAccessToken(accessToken);
             if (decodeAccessToken) {
                 throw new AppError(StatusCodes.FORBIDDEN, 'Token Is Live Can`t create New One Untill expires')
@@ -101,7 +105,8 @@ class UserService {
     }
     async logoutUser(refreshToken,accessToken) {
         try {
-
+            await helpers.blacklistToken(refreshToken,accessToken);
+            return true
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error)
         }

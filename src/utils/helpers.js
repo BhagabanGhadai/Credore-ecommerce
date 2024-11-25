@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const configs = require('../configs/index.js')
+const redis = require('../utils/cache')
 
 class Helper {
 
@@ -41,6 +42,26 @@ class Helper {
     }
     static async decodeRefreshToken(refreshToken) {
         return jwt.verify(refreshToken, configs.REFRESH_TOKEN_SECRET)
+    }
+    static async blacklistToken(refreshToken,accessToken) { 
+        const decodedRefreshToken = this.decodeRefreshToken(refreshToken);
+        const decodeAccessToken = this.decodeAccessToken(accessToken);
+        const refreshTokenExpiresIn = decodedRefreshToken.exp * 1000 - Date.now(); 
+        const accessTokenExpiresIn = decodeAccessToken.exp * 1000 - Date.now(); 
+        if (accessTokenExpiresIn > 0) { 
+            await redis.set(`access:blacklist:${accessToken}`, accessToken, 'PX', accessTokenExpiresIn); 
+        }
+        if (refreshTokenExpiresIn > 0) { 
+            await redis.set(`refresh:blacklist:${refreshToken}`, refreshToken, 'PX', refreshTokenExpiresIn); 
+        } 
+    }
+    static async isAccessTokenBlacklisted(accessToken) { 
+        const blacklistedAccessToken = await redis.get(`access:blacklist:${accessToken}`);
+        return blacklistedAccessToken !== null
+    }
+    static async isRefreshTokenBlacklisted(refreshToken) {
+        const blacklistedRefreshToken = await redis.get(`refresh:blacklist:${refreshToken}`);
+        return blacklistedRefreshToken !== null
     }
 }
 module.exports = Helper

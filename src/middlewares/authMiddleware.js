@@ -9,6 +9,10 @@ exports.verifyJWT = catchAsync(async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '')
     if (!token) throw new AppError(StatusCodes.UNAUTHORIZED, 'Unauthorized request')
     try {
+        const blacklisted = await helper.isAccessTokenBlacklisted(token)
+        if (blacklisted) { 
+            throw new AppError(StatusCodes.UNAUTHORIZED, 'Token has been revoked'); 
+        }
         const decodedToken = await helper.decodeAccessToken(token)
         if (!decodedToken) {
             throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid access token')
