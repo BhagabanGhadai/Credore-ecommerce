@@ -57,13 +57,9 @@ class UserRepository {
             throw new AppError(error.code, error.message, error)
         }
     }
-    async getAllUser() {
+    async getAllUser(filter) {
         try {
-            return await prisma.user.findMany({
-                orderBy:{
-                 created_at:"desc"
-                }
-             });
+            return await prisma.user.findMany(filter);
         } catch (error) {
             throw new AppError(error.code, error.message, error)
         }

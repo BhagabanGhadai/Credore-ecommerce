@@ -8,11 +8,10 @@ const orderItemRouter = require('./orderItem.js');
 
 function defineRoutes(expressApp) {
     logger.info('Defining routes...');
-
     expressApp.use('/api/v1/users', userRouter);
     expressApp.use('/api/v1/products', productRouter);
     expressApp.use('/api/v1/orders', orderRouter);
-    expressApp.use('/api/v1/orderItems', orderItemRouter);
+    expressApp.use('/api/v1/order-items', orderItemRouter);
     // health check
     expressApp.get('/health-check', (_, res) => {
         res.status(StatusCodes.OK).send({ message: 'helath check successful', status: true });

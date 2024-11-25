@@ -11,7 +11,22 @@ module.exports = {
         return res.status(StatusCodes.CREATED).json(new ApiResponse( StatusCodes.CREATED, order));
     }),
     getAllOrders : catchAsync(async (req, res) => {
-        const orders = await orderService.fetchAllOrder(req.query);
+        let filter = {
+            include:{
+                items:{
+                    include:{
+                        product:true
+                    }
+                }
+            }
+        }
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
+    
+        const skip = (page - 1) * pageSize;
+        filter.skip = skip;
+        filter.take = pageSize;
+        const orders = await orderService.fetchAllOrder(filter);
         return res.status(StatusCodes.OK).json(new ApiResponse( StatusCodes.OK, orders));
     }),
     getAllOrdersByUserId : catchAsync(async (req, res) => {

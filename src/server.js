@@ -5,6 +5,7 @@ const compression = require('compression');
 const morgan = require('morgan');
 const configs = require('./configs/index.js');
 const logger = require('./utils/logger.js');
+const rateLimit = require('express-rate-limit');
 const { defineRoutes } = require('./routers/index.js');
 const { errorHandler } = require('./utils/errorHandler.js');
 const { ErrorHandlingMiddleware } = require('./middlewares/globalErrorHandlerMiddleware.js');
@@ -22,7 +23,12 @@ const createExpressApp = () => {
     expressApp.use(helmet());
     expressApp.use(express.json());
     expressApp.use(express.urlencoded({ extended: true }));
-
+    //apply ratelimitter middleware
+    const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes 
+        max: 100, // Limit each IP to 100 requests per windowMs 
+        message: 'Too many requests from this IP, please try again later' });
+    expressApp.use(limiter)
     // Apply compression middleware with custom configuration
     expressApp.use(
         compression({

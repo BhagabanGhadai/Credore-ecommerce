@@ -1,4 +1,4 @@
-const { body, param } = require('express-validator');
+const { body, param, header, query } = require('express-validator');
 
 const addProductValidators = () => {
   return [
@@ -26,12 +26,21 @@ const addProductValidators = () => {
       .withMessage('Stock quantity is required')
       .isInt({ min: 0, max: 1000 })
       .withMessage('Stock quantity must be between 0 and 1000')
-      .toInt()
+      .toInt(),
+    header('Authorization')
+      .notEmpty()
+      .withMessage('Authorization header is required')
+      .matches(/^Bearer .+$/)
+      .withMessage('Authorization header must be in format Bearer <jwt>')
   ];
 };
 
 const updateProductValidators = () => {
   return [
+    param('productId')
+      .notEmpty()
+      .withMessage('Product ID is required')
+      .escape(),
     body('name')
       .optional()
       .isLength({ min: 3, max: 50 })
@@ -52,7 +61,49 @@ const updateProductValidators = () => {
       .optional()
       .isInt({ min: 0, max: 1000 })
       .withMessage('Stock quantity must be between 0 and 1000'),
+    header('Authorization')
+      .notEmpty()
+      .withMessage('Authorization header is required')
+      .matches(/^Bearer .+$/)
+      .withMessage('Authorization header must be in format Bearer <jwt>')
   ];
 };
 
-module.exports = { addProductValidators, updateProductValidators };
+const getProductValidators = () => {
+  return [
+    param('productId')
+      .notEmpty()
+      .withMessage('Product ID is required')
+      .escape(),
+    header('Authorization')
+      .notEmpty()
+      .withMessage('Authorization header is required')
+      .matches(/^Bearer .+$/)
+      .withMessage('Authorization header must be in format Bearer <jwt>')
+  ];
+}
+const getAllProductValidator = () => {
+  return [
+    query("search")
+      .optional()
+      .isLength({ max: 20 })
+      .withMessage("search may be at most 20 characters long")
+      .escape(),  // Escape the input
+    query("page")
+      .optional()
+      .isInt()
+      .withMessage("Page must be a number")
+      .toInt(),
+    query("pageSize")
+      .optional()
+      .isInt()
+      .withMessage("Page size must be a number")
+      .toInt(),
+    header('Authorization')
+      .notEmpty()
+      .withMessage('Authorization header is required')
+      .matches(/^Bearer .+$/)
+      .withMessage('Authorization header must be in format Bearer <jwt>')
+  ];
+}
+module.exports = { addProductValidators, updateProductValidators,getProductValidators,getAllProductValidator };

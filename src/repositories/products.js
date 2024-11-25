@@ -42,6 +42,18 @@ class ProductRepository {
         }
     }
 
+    async updateProductByProductId(ProductId, productData) {
+        try {
+            return await prisma.product.update({
+                where: {
+                    id: ProductId
+                },
+                data: productData
+            })
+        } catch (error) {
+            throw new AppError(error.statusCode, error.message, error)
+        }
+    }
     async updateTheProductStock(productId, quantity) {
         try {
             return await prisma.product.update({
@@ -49,8 +61,8 @@ class ProductRepository {
                     id: productId
                 },
                 data: {
-                    stock: {
-                        increment: -quantity
+                    stockQuantity: {
+                        increment: quantity
                     }
                 }
             })

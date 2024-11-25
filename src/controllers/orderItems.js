@@ -2,8 +2,7 @@ const OrderitemService = require('../services/orderItems');
 const StatusCodes = require('http-status-codes');
 const ApiResponse = require('../utils/apiResponse');
 const { catchAsync } = require('../utils/asyncHandler');
-const { get } = require('lodash');
-const { getOrder } = require('./orders');
+
 
 const orderItemService = new OrderitemService();
 

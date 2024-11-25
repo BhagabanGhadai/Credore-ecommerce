@@ -19,9 +19,9 @@ module.exports ={
     }),
 
     refreshAccessToken : catchAsync(async (req, res) => {
-        const { refreshToken } = req.body;
-        const accessToken = await userService.refreshAccessToken(refreshToken);
-        return res.status(StatusCodes.OK).json(new ApiResponse( StatusCodes.OK, accessToken));
+        const { refreshToken,accessToken } = req.body;
+        const accessTokenGeneration = await userService.refreshAccessToken(refreshToken,accessToken);
+        return res.status(StatusCodes.OK).json(new ApiResponse( StatusCodes.OK, accessTokenGeneration));
     }),
     updateUser: catchAsync(async (req, res) => {
         const { userId } = req.params;
@@ -35,7 +35,38 @@ module.exports ={
         return res.status(StatusCodes.OK).json(new ApiResponse( StatusCodes.OK, user));
     }),
     getAllUsers : catchAsync(async (req, res) => {
-        const users = await userService.fetchAllUsers(req.query);
+        let filter = {
+            include:{
+                orders:true
+            }
+        }
+        if (req.query.search) {
+            filter.where = {
+                ...filter.where,
+                OR:[
+                    {
+                        name: {
+                            contains: req.query.search,
+                            mode: 'insensitive'
+                        } 
+                    },
+                    {
+                        email: {
+                            contains: req.query.search,
+                            mode: 'insensitive'
+                        } 
+                    }
+                ]
+            };
+        }
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
+    
+        const skip = (page - 1) * pageSize;
+        filter.skip = skip;
+        filter.take = pageSize;
+ 
+        const users = await userService.fetchAllUsers(filter);
         return res.status(StatusCodes.OK).json(new ApiResponse( StatusCodes.OK, users));
     }),
     deleteUser : catchAsync(async (req, res) => {

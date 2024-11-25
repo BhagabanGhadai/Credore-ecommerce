@@ -28,7 +28,6 @@ const errorHandler = {
 
     handleError: async (errorToHandle) => {
         try {
-            console.log(errorHandler)
             let appError;
             if (errorToHandle instanceof AppError) {
                 logger.debug('Handling AppError:', errorToHandle);

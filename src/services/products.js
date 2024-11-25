@@ -47,12 +47,28 @@ class ProductService {
             throw new AppError(error.statusCode, error.message, error)
         }
     }
-    async updateTheProductStock(productId, quantity) {
+    async updateProductByProductId(ProductId, productData) {
         try {
             const product = await this.productRepository.fetchProductByProductId(ProductId);
             if (!product) {
                 throw new AppError(StatusCodes.NOT_FOUND, 'Product not found')
             }
+            const updateProduct = await this.productRepository.updateProductByProductId(ProductId, productData);
+            return updateProduct;
+        } catch (error) {
+            throw new AppError(error.statusCode, error.message, error)
+        }
+    }
+    async updateTheProductStock(productId, quantity) {
+        try {
+            const product = await this.productRepository.fetchProductByProductId(productId);
+            if (!product) {
+                throw new AppError(StatusCodes.NOT_FOUND, 'Product not found')
+            }
+            if (product.stock < quantity) {
+                throw new AppError(StatusCodes.BAD_REQUEST, 'Insufficient stock')
+            }
+            console.log(productId, quantity)
             const updateProduct = await this.productRepository.updateTheProductStock(productId, quantity);
             return updateProduct;
         } catch (error) {        

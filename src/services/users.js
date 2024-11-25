@@ -28,8 +28,10 @@ class UserService {
             }
             const isPasswordMatch = await helpers.validateThePassword(password, user.password);
             if (!isPasswordMatch) {
+                logger.error(`Failed login attempt for email: ${email}`);
                 throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid email or password')
             }
+            logger.info(`Login attempt for email: ${email}`);
             const token = await helpers.generateAccessAndRefreshTokens(user);            
             return token;
         } catch (error) {
@@ -38,6 +40,10 @@ class UserService {
     }
     async refreshAccessToken(refreshToken) {
         try {
+            const decodeAccessToken = await helpers.decodeAccessToken(accessToken);
+            if (decodeAccessToken) {
+                throw new AppError(StatusCodes.FORBIDDEN, 'Token Is Live Can`t create New One Untill expires')
+            }
             const decodedToken = await helpers.decodeRefreshToken(refreshToken);
             if (!decodedToken) {
                 throw new AppError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
@@ -61,7 +67,9 @@ class UserService {
     }
     async fetchAllUsers(filter) {
         try {
+            console.log(filter)
             const users = await this.userRepository.getAllUser(filter);
+            console.log(users)
             return users;
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error)
