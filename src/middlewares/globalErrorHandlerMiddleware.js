@@ -1,4 +1,4 @@
-const errorHandler = require('../utils/errorHandler.js')
+const { errorHandler } = require('../utils/errorHandler.js')
 const logger = require('../utils/logger.js')
 const configs = require('../configs/index.js')
 
@@ -16,14 +16,14 @@ exports.ErrorHandlingMiddleware = (expressApp) => {
         }
         let err = await errorHandler.handleError(error)
         const response = {
-            ...error,
-            message: error.message,
+            ...err,
+            message: err.message,
             ...(configs.NODE_ENV === 'dev' ? { stack: error.stack } : {})
         }
         if (configs.NODE_ENV === 'dev') {
             logger.error(response)
         }
-        return res.status(error.statusCode).send(response)
+        return res.status(err.statusCode).send(response)
     })
 }
 

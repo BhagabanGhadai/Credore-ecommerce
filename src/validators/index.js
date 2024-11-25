@@ -1,8 +1,8 @@
 const { validationResult } =require('express-validator');
-const { errorHandler } =require('../middlewares/error.middleware');
-const { ApiError } = require('../../utils/ApiError.js')
+const AppError = require('../utils/appError.js');
+const StatusCodes = require('http-status-codes');
 
-export const validate = (req, res, next) => {
+const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
     return next();
@@ -10,5 +10,7 @@ export const validate = (req, res, next) => {
   const extractedErrors = [];
   errors.array().map((err) => extractedErrors.push({ [err.path]: err.msg }));
 
-  throw new ApiError(422, "Received data is not valid", extractedErrors);
+  throw new AppError(StatusCodes.UNPROCESSABLE_ENTITY, "Received data is not valid", extractedErrors);
 };
+
+module.exports= validate

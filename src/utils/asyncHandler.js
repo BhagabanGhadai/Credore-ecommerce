@@ -9,7 +9,7 @@
  * any errors that occur.
  */
 
-export const catchAsync = (requestHandler) => {
+exports.catchAsync = (requestHandler) => {
     return async (req, res, next) => {
         try {
             await requestHandler(req, res, next)

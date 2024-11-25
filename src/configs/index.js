@@ -9,5 +9,6 @@ module.exports = {
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES,
     JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES,
-    NODE_ENV: process.env.NODE_ENV
+    NODE_ENV: process.env.NODE_ENV,
+    SALT_ROUND: process.env.SALT_ROUND
 };

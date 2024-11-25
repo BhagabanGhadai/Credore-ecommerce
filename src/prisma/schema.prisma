@@ -19,6 +19,7 @@ model User {
   name       String
   email      String   @unique
   password   String
+  role       Role     @default(user) 
   is_active  Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -67,4 +68,9 @@ enum Status {
   pending
   cancelled 
   delivered
+}
+
+enum Role {
+  user
+  admin
 }

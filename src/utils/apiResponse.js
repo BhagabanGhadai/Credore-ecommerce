@@ -1,4 +1,4 @@
-export class ApiResponse {
+module.exports = class ApiResponse {
     /**
      * Creates an instance of ApiResponse.
      *
@@ -14,3 +14,4 @@ export class ApiResponse {
         this.success = statusCode < 400
     }
 }
+
