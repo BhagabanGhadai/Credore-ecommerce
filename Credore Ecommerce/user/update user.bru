@@ -1,0 +1,17 @@
+meta {
+  name: update user
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost:8080/api/v1/users/cm3wu3iy90000y6ygifaf509j
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name":"i am user"
+  }
+}
