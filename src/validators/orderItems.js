@@ -58,8 +58,27 @@ const getOrderItemValidator = () => {
       body('quantity')
         .optional()
         .isInt({ min: 1, max: 1000 })
-        .withMessage('Quantity must be between 1 and 1000')
+        .withMessage('Quantity must be between 1 and 1000'),
+      body('orderId')
+        .optional()
+        .escape(),
+      body('productId')
+        .optional()
+        .escape()
     ];
   }
   
-  module.exports={getOrderItemValidator,createOrderItemValidator,updateOrderItemValidator}
+  const deleteOrderItemValidator = () => {
+    return [
+        param('orderId')
+        .notEmpty()
+        .withMessage('Order Item ID is required')
+        .escape(),
+      header('Authorization')
+        .notEmpty()
+        .withMessage('Authorization header is required')
+        .matches(/^Bearer .+$/)
+        .withMessage('Authorization header must be in format Bearer <jwt>')
+    ];
+  }
+  module.exports={getOrderItemValidator,createOrderItemValidator,updateOrderItemValidator,deleteOrderItemValidator}
