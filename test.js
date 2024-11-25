@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 
 export const options = {
-  vus: 200,
+  vus: 100,
   duration: '1s',
   cloud: {
     // Project: Default project
@@ -17,14 +17,12 @@ export const options = {
 };
 
 export default function() {
-  const payload = JSON.stringify({
-    email: "demo@admin.in",
-    password: "Admin@123"
-  });
+  const url = 'http://localhost:8080/api/v1/products/cm3wv8ms9000anv701rolywtw';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtM3d2NDhicTAwMDAxOW9qdG92ZnFhaDIiLCJpYXQiOjE3MzI1NTA0MTEuMzkxLCJleHAiOjE3MzI1NTQwMTF9.utKU2-B0m5Twx2jBMcEIrFZz6jHGdxeOdBviyYfvHSQ';
 
-  http.post('http://localhost:8080/api/v1/users/login', payload, {
+  http.get(url, {
     headers: {
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`
     }
   });
   sleep(1);

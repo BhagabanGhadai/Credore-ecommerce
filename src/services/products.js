@@ -19,9 +19,15 @@ class ProductService {
     }
 
     async fetchAllProduct(filter) {  
-        try {   
-            const product = await this.productRepository.fetchAllProduct(filter);
-            return product;
+        try {
+            const key = `products:${JSON.stringify(filter)}`;
+            const cachedProducts = await redis.get(key);
+            if (cachedProducts) {
+                return JSON.parse(cachedProducts);
+            }
+            const products = await this.productRepository.fetchAllProduct(filter);
+            await redis.set(key, JSON.stringify(products), 'EX', configs.cacheTime.productCacheTime);
+            return products;
         } catch (error) {
             throw new AppError(error.statusCode, error.message, error)
         }
